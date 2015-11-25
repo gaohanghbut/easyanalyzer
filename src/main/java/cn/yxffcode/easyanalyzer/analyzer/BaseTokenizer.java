@@ -1,8 +1,8 @@
 package cn.yxffcode.easyanalyzer.analyzer;
 
-import com.google.common.base.Strings;
 import cn.yxffcode.easyanalyzer.collection.IntStack;
 import cn.yxffcode.easyanalyzer.lang.IntArrayStringBuilder;
+import com.google.common.base.Strings;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -31,6 +31,14 @@ abstract class BaseTokenizer extends Tokenizer {
      * 读到了{@link #reader}的最后
      */
     private static final int EOF            = -1;
+    /**
+     * 中文字符的起始数字
+     */
+    private static final int CN_CHAR_FIRST  = 19968;
+    /**
+     * 中文字符的最大字符数字
+     */
+    private static final int CN_CHAR_LAST   = 171941;
 
     /**
      * 底层字典的存储，用于分词时将输入与之做匹配
@@ -221,7 +229,7 @@ abstract class BaseTokenizer extends Tokenizer {
      * 判断字符是不是中文字符
      */
     private boolean isChineseCharacter(int ch) {
-        return ch >= 19968 && ch <= 171941;
+        return ch >= CN_CHAR_FIRST && ch <= CN_CHAR_LAST;
     }
 
     protected abstract void onUnmatched(IntArrayStringBuilder appender);
