@@ -1,1 +1,1 @@
-基于Lucene中的有限状态机(见org.apache.lucene.util.fst.FST)实现的基于字典的中文分词器,支持任何形式的词条.
+基于Lucene中的有限状态机(见org.apache.lucene.util.fst.FST)实现的基于字典的中文分词器
