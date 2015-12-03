@@ -1,4 +1,5 @@
 import cn.yxffcode.easyanalyzer.analyzer.CompleteFSTAnalyzer;
+import cn.yxffcode.easyanalyzer.analyzer.MaxCountAnalyzer;
 import cn.yxffcode.easyanalyzer.analyzer.PrefixWordFSTAnalyzer;
 import cn.yxffcode.easyanalyzer.analyzer.ShortestFSTAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
@@ -13,22 +14,21 @@ import java.util.Iterator;
  */
 public class Test {
     public static void main(String[] args) throws IOException {
+        System.out.print("前缀词匹配:");
         token(PrefixWordFSTAnalyzer.create("test/", true));
 
-        System.out.println("========");
+        System.out.print("最长匹配:");
         token(CompleteFSTAnalyzer.create("test/", true));
 
-
-        System.out.println("========");
+        System.out.print("最短匹配:");
         token(ShortestFSTAnalyzer.create("test/", true));
 
+        System.out.print("最多数量匹配:");
+        token(MaxCountAnalyzer.create("test/", true));
     }
 
     private static void token(Analyzer analyzer) throws IOException {
-//        final TokenStream tokenStream = analyzer.tokenStream("test", "X6benz");
-        final TokenStream tokenStream = analyzer.tokenStream("test", "中国人民厘米库放心可靠二手车");
-//        final TokenStream tokenStream = analyzer.tokenStream("test", "benz bmw ok 奔\n驰porsche\r宝马X5宝benz宝马X60987中国人");
-//        final TokenStream tokenStream = analyzer.tokenStream("test", "benz宝马X6");
+        final TokenStream tokenStream = analyzer.tokenStream("test", "湖北工业大学生");
         tokenStream.reset();
         while (tokenStream.incrementToken()) {
             final Iterator<Class<? extends Attribute>> iterator = tokenStream.getAttributeClassesIterator();

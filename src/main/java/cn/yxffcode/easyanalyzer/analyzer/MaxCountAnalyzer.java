@@ -1,6 +1,5 @@
 package cn.yxffcode.easyanalyzer.analyzer;
 
-import cn.yxffcode.easyanalyzer.collection.IntStack;
 import cn.yxffcode.easyanalyzer.lang.IntArrayStringBuilder;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.util.CharsRef;
@@ -14,9 +13,11 @@ import java.util.SortedSet;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @author gaohang on 15/11/18.
+ * 最多数量匹配
+ *
+ * @author gaohang on 15/12/3.
  */
-public class PrefixWordFSTAnalyzer extends Analyzer {
+public class MaxCountAnalyzer extends Analyzer {
 
     /**
      * 从指定的classpath路径下读取词典，使用{@link Thread#getContextClassLoader()}
@@ -30,7 +31,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
      * @throws IOException 读取字典或创建FST出错
      * @see #create(String, ClassLoader, boolean)
      */
-    public static PrefixWordFSTAnalyzer create(String classpath,
+    public static MaxCountAnalyzer create(String classpath,
                                                boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(classpath), outputPrefix);
     }
@@ -46,7 +47,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
      *
      * @throws IOException 读取字典或创建FST出错
      */
-    public static PrefixWordFSTAnalyzer create(String classpath,
+    public static MaxCountAnalyzer create(String classpath,
                                                ClassLoader classLoader,
                                                boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(classpath, classLoader), outputPrefix);
@@ -58,7 +59,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
      * @param dictionaries 词典文件列表
      * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
      */
-    public static PrefixWordFSTAnalyzer create(@NotNull Iterable<File> dictionaries,
+    public static MaxCountAnalyzer create(@NotNull Iterable<File> dictionaries,
                                                boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(dictionaries), outputPrefix);
     }
@@ -70,7 +71,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
      *                     使用字符串的默认排序，不要使用字符串的自定义排序
      * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
      */
-    public static PrefixWordFSTAnalyzer create(@NotNull SortedSet<String> sortedWords,
+    public static MaxCountAnalyzer create(@NotNull SortedSet<String> sortedWords,
                                                boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(sortedWords), outputPrefix);
     }
@@ -78,98 +79,57 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
     /**
      * 通过FST创建分词器，如果需要在多个分词器之间共享FST或者复用已有的FST，可以使用此方法创建分词器
      */
-    public static PrefixWordFSTAnalyzer create(FST<CharsRef> fst,
+    public static MaxCountAnalyzer create(FST<CharsRef> fst,
                                                boolean outputPrefix) {
         checkNotNull(fst);
-        return new PrefixWordFSTAnalyzer(fst, outputPrefix);
+        return new MaxCountAnalyzer(fst, outputPrefix);
     }
 
     private final FST<CharsRef> fst;
     private final boolean       outputPrefix;
 
-    private PrefixWordFSTAnalyzer(FST<CharsRef> fst,
+    private MaxCountAnalyzer(FST<CharsRef> fst,
                                   boolean outputPrefix) {
         this.fst = fst;
         this.outputPrefix = outputPrefix;
     }
 
     @Override
-    protected TokenStreamComponents createComponents(String fieldName) {
+    protected TokenStreamComponents createComponents(final String fieldName) {
         return new TokenStreamComponents(new FSTTokenizer(fst, outputPrefix));
     }
 
-    static class FSTTokenizer extends BaseTokenizer {
+    static final class FSTTokenizer extends PrefixWordFSTAnalyzer.FSTTokenizer {
 
-        private       IntStack              words;
-        private       IntArrayStringBuilder appender;
-        private final boolean               outputPrefix;
+        private IntArrayStringBuilder matched;
 
-        FSTTokenizer(FST<CharsRef> fst,
-                     boolean outputPrefix) {
-            super(fst);
-            this.words = new IntStack();
-            this.outputPrefix = outputPrefix;
-        }
-
-        @Override
-        protected String nextWorld() throws IOException {
-            while (words.isEmpty() && state != TokenState.FINISHED) {
-                doToken();
-            }
-            if (words.isEmpty()) {
-                return null;
-            }
-            return appender.toString(0, words.poll());
-        }
-
-        @Override
-        protected void onUnmatched(IntArrayStringBuilder appender) {
-            if (! words.isEmpty()) {
-                pushBack(appender, words.peak());
-                return;
-            }
-            if (outputPrefix) {
-                onWordMatched(appender);
-            }
-        }
-
-        protected void pushBack(final IntArrayStringBuilder appender, final int begin) {
-            for (int i = appender.length() - 1; i >= begin; -- i) {
-                bufStack.push(appender.element(i));
-            }
+        FSTTokenizer(final FST<CharsRef> fst,
+                     final boolean outputPrefix) {
+            super(fst, outputPrefix);
         }
 
         @Override
         protected void onMatchFinished(IntArrayStringBuilder appender) {
-            if (words.isEmpty()) {
-                onWordMatched(appender);
-                return;
+            if (remains()) {
+                int s = shortestWord();
+                if (s != appender.length()) {//如果栈里的元素和当前元素不相同才压回
+                    pushBack(appender, s);
+                } else if (state != TokenState.FINISHED){
+                    pushBack(appender, 0);
+                    matched = appender;
+                }
+            } else {
+                if (state == TokenState.FINISHED || (matched != null && matched.endWith(appender))) {
+                    matched = null;
+                    return;
+                }
+                //压回所有
+                pushBack(appender, 0);
+                matched = appender;
             }
-            if (words.peak() != appender.length()) {
-                onWordMatched(appender);
-            }
+            super.onMatchFinished(appender);
+            matched = appender;
         }
 
-        @Override
-        protected boolean onWordMatched(IntArrayStringBuilder appender) {
-            words.push(appender.length());
-            capture(appender);
-            return true;
-        }
-
-        protected boolean remains() {
-            return ! words.isEmpty();
-        }
-
-        protected int shortestWord() {
-            return words.botton();
-        }
-
-        private void capture(IntArrayStringBuilder appender) {
-            if (this.appender == null || this.appender != appender) {
-                this.appender = appender;
-            }
-        }
     }
-
 }

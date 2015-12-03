@@ -32,6 +32,13 @@ public class IntStack {
         return value;
     }
 
+    public int botton() {
+        if (isEmpty()) {
+            throw new IllegalStateException("stack is empty");
+        }
+        return stack[0];
+    }
+
     public int peak() {
         return stack[top - 1];
     }
