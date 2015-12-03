@@ -100,9 +100,9 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
 
     static class FSTTokenizer extends BaseTokenizer {
 
-        private       IntStack              words;
-        private       IntArrayStringBuilder appender;
-        private final boolean               outputPrefix;
+        protected       IntStack              words;
+        private         IntArrayStringBuilder appender;
+        protected final boolean               outputPrefix;
 
         FSTTokenizer(FST<CharsRef> fst,
                      boolean outputPrefix) {
@@ -133,7 +133,8 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
             }
         }
 
-        protected void pushBack(final IntArrayStringBuilder appender, final int begin) {
+        protected void pushBack(final IntArrayStringBuilder appender,
+                                final int begin) {
             for (int i = appender.length() - 1; i >= begin; -- i) {
                 bufStack.push(appender.element(i));
             }
