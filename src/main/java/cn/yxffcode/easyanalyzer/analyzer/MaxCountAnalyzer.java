@@ -32,7 +32,7 @@ public class MaxCountAnalyzer extends Analyzer {
      * @see #create(String, ClassLoader, boolean)
      */
     public static MaxCountAnalyzer create(String classpath,
-                                               boolean outputPrefix) throws IOException {
+                                          boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(classpath), outputPrefix);
     }
 
@@ -48,8 +48,8 @@ public class MaxCountAnalyzer extends Analyzer {
      * @throws IOException 读取字典或创建FST出错
      */
     public static MaxCountAnalyzer create(String classpath,
-                                               ClassLoader classLoader,
-                                               boolean outputPrefix) throws IOException {
+                                          ClassLoader classLoader,
+                                          boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(classpath, classLoader), outputPrefix);
     }
 
@@ -60,7 +60,7 @@ public class MaxCountAnalyzer extends Analyzer {
      * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
      */
     public static MaxCountAnalyzer create(@NotNull Iterable<File> dictionaries,
-                                               boolean outputPrefix) throws IOException {
+                                          boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(dictionaries), outputPrefix);
     }
 
@@ -72,7 +72,7 @@ public class MaxCountAnalyzer extends Analyzer {
      * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
      */
     public static MaxCountAnalyzer create(@NotNull SortedSet<String> sortedWords,
-                                               boolean outputPrefix) throws IOException {
+                                          boolean outputPrefix) throws IOException {
         return create(FSTFactory.create(sortedWords), outputPrefix);
     }
 
@@ -80,7 +80,7 @@ public class MaxCountAnalyzer extends Analyzer {
      * 通过FST创建分词器，如果需要在多个分词器之间共享FST或者复用已有的FST，可以使用此方法创建分词器
      */
     public static MaxCountAnalyzer create(FST<CharsRef> fst,
-                                               boolean outputPrefix) {
+                                          boolean outputPrefix) {
         checkNotNull(fst);
         return new MaxCountAnalyzer(fst, outputPrefix);
     }
@@ -89,7 +89,7 @@ public class MaxCountAnalyzer extends Analyzer {
     private final boolean       outputPrefix;
 
     private MaxCountAnalyzer(FST<CharsRef> fst,
-                                  boolean outputPrefix) {
+                             boolean outputPrefix) {
         this.fst = fst;
         this.outputPrefix = outputPrefix;
     }
@@ -101,7 +101,7 @@ public class MaxCountAnalyzer extends Analyzer {
 
     static final class FSTTokenizer extends PrefixWordFSTAnalyzer.FSTTokenizer {
 
-        private IntArrayStringBuilder matched;
+        private IntArrayStringBuilder lastPushBack;
 
         FSTTokenizer(final FST<CharsRef> fst,
                      final boolean outputPrefix) {
@@ -114,18 +114,22 @@ public class MaxCountAnalyzer extends Analyzer {
                 int s = shortestWord();
                 if (s != appender.length()) {//如果栈里的元素和当前元素不相同才压回
                     pushBack(appender, s);
+                    lastPushBack = appender.slice(s, appender.length() - s);
                 }
             } else {
-                if (state == TokenState.FINISHED || (matched != null && matched.endWith(appender))) {
-                    matched = null;
+                if (state == TokenState.FINISHED) {
+                    lastPushBack = null;
+                    return;
+                }
+                if (lastPushBack != null && ! lastPushBack.isEmpty() && lastPushBack.startWith(appender)) {
+                    lastPushBack = lastPushBack.slice(appender.length());
                     return;
                 }
                 //压回所有
                 pushBack(appender, 0);
-                matched = appender;
+                lastPushBack = appender;
             }
             super.onMatchFinished(appender);
-            matched = appender;
         }
 
     }

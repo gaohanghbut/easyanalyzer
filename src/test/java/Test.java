@@ -31,7 +31,7 @@ public class Test {
     }
 
     private static void token(Analyzer analyzer) throws IOException {
-        final TokenStream tokenStream = analyzer.tokenStream("test", "奥迪Q湖北工业大学生");
+        final TokenStream tokenStream = analyzer.tokenStream("test", "奥迪Q5奥迪Q湖北工业大学生");
         tokenStream.reset();
         while (tokenStream.incrementToken()) {
             final Iterator<Class<? extends Attribute>> iterator = tokenStream.getAttributeClassesIterator();

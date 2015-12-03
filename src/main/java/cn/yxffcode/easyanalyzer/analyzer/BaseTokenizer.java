@@ -170,7 +170,7 @@ abstract class BaseTokenizer extends Tokenizer {
                         break;
                     }
                 }
-                onWordMatched(appender);
+                onMatchFinished(appender);
 
             } else if (isDigitWord(appender)) {
                 //check digits
@@ -182,7 +182,7 @@ abstract class BaseTokenizer extends Tokenizer {
                         break;
                     }
                 }
-                onWordMatched(appender);
+                onMatchFinished(appender);
             } else {
                 onUnmatched(appender);
             }
