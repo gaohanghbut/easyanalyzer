@@ -1,6 +1,6 @@
 import cn.yxffcode.easyanalyzer.analyzer.CompleteFSTAnalyzer;
 import cn.yxffcode.easyanalyzer.analyzer.MaxCountAnalyzer;
-import cn.yxffcode.easyanalyzer.analyzer.PrefixFirstAnalyzer;
+import cn.yxffcode.easyanalyzer.analyzer.PrefixWordFirstAnalyzer;
 import cn.yxffcode.easyanalyzer.analyzer.PrefixWordFSTAnalyzer;
 import cn.yxffcode.easyanalyzer.analyzer.ShortestFSTAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
@@ -18,7 +18,7 @@ public class Test {
         System.out.print("前缀词匹配:");
         token(PrefixWordFSTAnalyzer.create("test/", true));
         System.out.print("前缀词优先匹配:");
-        token(PrefixFirstAnalyzer.create("test/", true));
+        token(PrefixWordFirstAnalyzer.create("test/", true));
 
         System.out.print("最长匹配:");
         token(CompleteFSTAnalyzer.create("test/", true));

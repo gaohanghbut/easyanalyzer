@@ -15,9 +15,6 @@
 
 测试代码:
 
-/**
- * @author gaohang on 15/11/19.
- */
 public class Test {
     public static void main(String[] args) throws IOException {
         System.out.print("前缀词匹配:");
