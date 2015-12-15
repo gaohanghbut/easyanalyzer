@@ -5,45 +5,45 @@ package cn.yxffcode.easyanalyzer.collection;
  */
 public class IntStack {
 
-    private int[] stack;
-    private int   top;
+  private int[] stack;
+  private int   top;
 
-    public IntStack() {
-        this(10);
+  public IntStack() {
+    this(10);
+  }
+
+  public IntStack(int initSize) {
+    stack = new int[initSize];
+  }
+
+  public void push(int value) {
+    if (top == stack.length) {
+      int[] desc = new int[stack.length * 2];
+      System.arraycopy(stack, 0, desc, 0, top);
+      this.stack = desc;
     }
 
-    public IntStack(int initSize) {
-        stack = new int[initSize];
-    }
+    stack[top++] = value;
+  }
 
-    public void push(int value) {
-        if (top == stack.length) {
-            int[] desc = new int[stack.length * 2];
-            System.arraycopy(stack, 0, desc, 0, top);
-            this.stack = desc;
-        }
+  public int poll() {
+    int value = stack[top - 1];
+    top--;
+    return value;
+  }
 
-        stack[top++] = value;
+  public int botton() {
+    if (isEmpty()) {
+      throw new IllegalStateException("stack is empty");
     }
+    return stack[0];
+  }
 
-    public int poll() {
-        int value = stack[top - 1];
-        top--;
-        return value;
-    }
+  public boolean isEmpty() {
+    return top == 0;
+  }
 
-    public int botton() {
-        if (isEmpty()) {
-            throw new IllegalStateException("stack is empty");
-        }
-        return stack[0];
-    }
-
-    public int peak() {
-        return stack[top - 1];
-    }
-
-    public boolean isEmpty() {
-        return top == 0;
-    }
+  public int peak() {
+    return stack[top - 1];
+  }
 }
