@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MaxCountAnalyzer extends Analyzer {
 
   private final FST<CharsRef> fst;
-  private final boolean       outputPrefix;
+  private final boolean outputPrefix;
 
   private MaxCountAnalyzer(FST<CharsRef> fst, boolean outputPrefix) {
     this.fst = fst;
@@ -33,9 +33,7 @@ public class MaxCountAnalyzer extends Analyzer {
    *
    * @param classpath    词典文件的类路径，支持目录
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    * @see #create(String, ClassLoader, boolean)
    */
@@ -57,9 +55,7 @@ public class MaxCountAnalyzer extends Analyzer {
    * @param classpath    词典文件的类路径，支持目录
    * @param classLoader  用于加载词典文件的类加载器
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static MaxCountAnalyzer create(String classpath, ClassLoader classLoader,
@@ -117,7 +113,7 @@ public class MaxCountAnalyzer extends Analyzer {
           lastPushBack = null;
           return;
         }
-        if (lastPushBack != null && ! lastPushBack.isEmpty() && lastPushBack.startWith(appender)) {
+        if (lastPushBack != null && !lastPushBack.isEmpty() && lastPushBack.startWith(appender)) {
           lastPushBack = lastPushBack.slice(appender.length());
           return;
         }

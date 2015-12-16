@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CompleteFSTAnalyzer extends Analyzer {
 
   private final FST<CharsRef> fst;
-  private final boolean       outputPrefix;
+  private final boolean outputPrefix;
 
   /**
    * 私有化构造器，使用create方法创建分词器对象
@@ -47,9 +47,7 @@ public class CompleteFSTAnalyzer extends Analyzer {
    *
    * @param classpath    词典文件的类路径，支持目录
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    * @see #create(String, ClassLoader, boolean)
    */
@@ -71,9 +69,7 @@ public class CompleteFSTAnalyzer extends Analyzer {
    * @param classpath    词典文件的类路径，支持目录
    * @param classLoader  用于加载词典文件的类加载器
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static CompleteFSTAnalyzer create(String classpath, ClassLoader classLoader, boolean outputPrefix)
@@ -114,8 +110,8 @@ public class CompleteFSTAnalyzer extends Analyzer {
    */
   static class FSTTokenizer extends BaseTokenizer {
 
-    private boolean               outputPrefix;
-    private int                   lastMatched;
+    private boolean outputPrefix;
+    private int lastMatched;
     private IntArrayStringBuilder currentAppender;
 
     FSTTokenizer(FST<CharsRef> fst, boolean outputPrefix) {
@@ -164,10 +160,14 @@ public class CompleteFSTAnalyzer extends Analyzer {
     protected void onUnmatched(IntArrayStringBuilder appender) {
       //如果有最近匹配,则将不能完全匹配的字符压回
       if (lastMatched > 0) {
-        for (int i = appender.length() - 1; i >= lastMatched; -- i) {
+        for (int i = appender.length() - 1; i >= lastMatched; --i) {
           bufStack.push(appender.element(i));
         }
         return;
+      } else {
+        for (int i = appender.length() - 1; i >= 1; --i) {
+          bufStack.push(appender.element(i));
+        }
       }
       if (outputPrefix) {
         capture(appender);

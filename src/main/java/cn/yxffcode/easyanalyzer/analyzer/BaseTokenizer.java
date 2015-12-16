@@ -30,33 +30,33 @@ abstract class BaseTokenizer extends Tokenizer {
   /**
    * 读到了{@link #reader}的最后
    */
-  private static final int EOF            = - 1;
+  private static final int EOF = -1;
   /**
    * 中文字符的起始数字
    */
-  private static final int CN_CHAR_FIRST  = 19968;
+  private static final int CN_CHAR_FIRST = 19968;
   /**
    * 中文字符的最大字符数字
    */
-  private static final int CN_CHAR_LAST   = 171941;
+  private static final int CN_CHAR_LAST = 171941;
 
   /**
    * 底层字典的存储，用于分词时将输入与之做匹配
    */
-  private final FST<CharsRef>     fst;
+  private final FST<CharsRef> fst;
   /**
    * 分词后的词条结果
    */
   private final CharTermAttribute termAtt;
-  private final OffsetAttribute   offsetAtt;
-  private final TypeAttribute     typeAtt;
+  private final OffsetAttribute offsetAtt;
+  private final TypeAttribute typeAtt;
   /**
    * 用于临时存放没有完全匹配的字符，{@link PushbackReader}默认只支持一个字符的pushback，
    * 如果指定pushback的buffer大小，则每一次{@link #reset()}的调用都需要重新创建buffer。
    */
-  protected     IntStack          bufStack;
-  protected     TokenState        state;
-  private       Reader            reader;
+  protected IntStack bufStack;
+  protected TokenState state;
+  private Reader reader;
 
   protected BaseTokenizer(FST<CharsRef> fst) {
     this.fst = fst;
@@ -112,7 +112,7 @@ abstract class BaseTokenizer extends Tokenizer {
      * lastMatchedWord用来存储最近一次完全匹配，如果最终不能匹配，则返回最近一次完全匹配的词
      */
     outer:
-    while ((read = readNextChar()) != - 1) {
+    while ((read = readNextChar()) != -1) {
       //忽略换行符
       if (isLineDelimiter(read)) {
         continue;
@@ -131,7 +131,7 @@ abstract class BaseTokenizer extends Tokenizer {
            * 最近一次匹配失败，词条匹配结束，将最近一次读取压回输入流，
            * 如果是空白字符，则不需要压回
            */
-          if (! first && ! Character.isWhitespace(read)) {
+          if (!first && !Character.isWhitespace(read)) {
             bufStack.push(read);
           } else if (isEnglishChar(read) || Character.isDigit(read)) {
             appender.append(read);
@@ -148,7 +148,7 @@ abstract class BaseTokenizer extends Tokenizer {
       appender.append(read);
       first = false;
       //已经匹配成功了一个词条，匹配还没完成（可能不是最大匹配），存储最近匹配成功的词条
-      if (follow.isFinal() && ! appender.isBlank() && ! onWordMatched(appender)) {
+      if (follow.isFinal() && !appender.isBlank() && !onWordMatched(appender)) {
         return;
       }
     }
@@ -162,7 +162,7 @@ abstract class BaseTokenizer extends Tokenizer {
     } else {
       //check english words
       if (isEnglishWord(appender)) {
-        while ((read = readNextChar()) != - 1) {
+        while ((read = readNextChar()) != -1) {
           if (isEnglishChar(read)) {
             appender.append(read);
           } else {
@@ -174,7 +174,7 @@ abstract class BaseTokenizer extends Tokenizer {
 
       } else if (isDigitWord(appender)) {
         //check digits
-        while ((read = readNextChar()) != - 1) {
+        while ((read = readNextChar()) != -1) {
           if (Character.isDigit(read)) {
             appender.append(read);
           } else {
@@ -223,7 +223,7 @@ abstract class BaseTokenizer extends Tokenizer {
   private boolean isEnglishWord(IntArrayStringBuilder appender) {
     for (int i = 0, j = appender.length(); i < j; i++) {
       int element = appender.element(i);
-      if (! isEnglishChar(element)) {
+      if (!isEnglishChar(element)) {
         return false;
       }
     }
@@ -233,7 +233,7 @@ abstract class BaseTokenizer extends Tokenizer {
   private boolean isDigitWord(IntArrayStringBuilder appender) {
     for (int i = 0, j = appender.length(); i < j; i++) {
       int element = appender.element(i);
-      if (! Character.isDigit(element)) {
+      if (!Character.isDigit(element)) {
         return false;
       }
     }

@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class PrefixWordFirstAnalyzer extends Analyzer {
 
   private final FST<CharsRef> fst;
-  private final boolean       outputPrefix;
+  private final boolean outputPrefix;
 
   private PrefixWordFirstAnalyzer(FST<CharsRef> fst,
                                   boolean outputPrefix) {
@@ -36,9 +36,7 @@ public class PrefixWordFirstAnalyzer extends Analyzer {
    *
    * @param classpath    词典文件的类路径，支持目录
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    * @see #create(String, ClassLoader, boolean)
    */
@@ -62,9 +60,7 @@ public class PrefixWordFirstAnalyzer extends Analyzer {
    * @param classpath    词典文件的类路径，支持目录
    * @param classLoader  用于加载词典文件的类加载器
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static PrefixWordFirstAnalyzer create(String classpath,
@@ -114,7 +110,8 @@ public class PrefixWordFirstAnalyzer extends Analyzer {
         onWordMatched(appender);
         return;
       }
-      if (! remains()) {
+      pushBack(appender, 1);
+      if (remains()) {
         pushBack(appender, words.peak());
       }
     }

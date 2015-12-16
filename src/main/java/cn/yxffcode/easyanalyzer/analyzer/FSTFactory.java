@@ -13,17 +13,9 @@ import org.apache.lucene.util.fst.FST;
 import org.apache.lucene.util.fst.Util;
 
 import javax.validation.constraints.NotNull;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.SortedSet;
+import java.util.*;
 
 import static cn.yxffcode.easyanalyzer.utils.StringUtils.isBlank;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,9 +31,7 @@ abstract class FSTFactory {
 
   /**
    * @param classpath 词典文件的类路径，支持目录
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static FST<CharsRef> create(String classpath) throws IOException {
@@ -51,9 +41,7 @@ abstract class FSTFactory {
   /**
    * @param classpath   词典文件的类路径，支持目录
    * @param classLoader 用于加载词典文件的类加载器
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static FST<CharsRef> create(String classpath, ClassLoader classLoader) throws IOException {
@@ -73,7 +61,7 @@ abstract class FSTFactory {
           continue;
         }
         LinkedList<File> queue = Lists.newLinkedList(Arrays.asList(files));
-        while (! queue.isEmpty()) {
+        while (!queue.isEmpty()) {
           File f = queue.removeFirst();
           if (f.isFile()) {
             try (BufferedReader in = new BufferedReader(new FileReader(f))) {

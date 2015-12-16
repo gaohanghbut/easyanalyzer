@@ -6,7 +6,7 @@ package cn.yxffcode.easyanalyzer.collection;
 public class IntStack {
 
   private int[] stack;
-  private int   top;
+  private int top;
 
   public IntStack() {
     this(10);

@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ShortestFSTAnalyzer extends Analyzer {
 
   private final FST<CharsRef> fst;
-  private final boolean       outputPrefix;
+  private final boolean outputPrefix;
 
   private ShortestFSTAnalyzer(FST<CharsRef> fst, boolean outputPrefix) {
     this.fst = fst;
@@ -33,9 +33,7 @@ public class ShortestFSTAnalyzer extends Analyzer {
    *
    * @param classpath    词典文件的类路径，支持目录
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    * @see #create(String, ClassLoader, boolean)
    */
@@ -57,9 +55,7 @@ public class ShortestFSTAnalyzer extends Analyzer {
    * @param classpath    词典文件的类路径，支持目录
    * @param classLoader  用于加载词典文件的类加载器
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static ShortestFSTAnalyzer create(String classpath,
@@ -98,9 +94,9 @@ public class ShortestFSTAnalyzer extends Analyzer {
 
   static final class FSTTokenizer extends BaseTokenizer {
 
-    private final boolean               outputPrefix;
-    private       int                   word;
-    private       IntArrayStringBuilder appender;
+    private final boolean outputPrefix;
+    private int word;
+    private IntArrayStringBuilder appender;
 
     FSTTokenizer(FST<CharsRef> fst, boolean outputPrefix) {
       super(fst);
@@ -137,10 +133,14 @@ public class ShortestFSTAnalyzer extends Analyzer {
     @Override
     protected void onUnmatched(IntArrayStringBuilder appender) {
       if (word > 0) {
-        for (int i = appender.length() - 1; i >= word; -- i) {
+        for (int i = appender.length() - 1; i >= word; --i) {
           bufStack.push(appender.element(i));
         }
         return;
+      } else {
+        for (int i = appender.length() - 1; i >= 1; --i) {
+          bufStack.push(appender.element(i));
+        }
       }
       if (outputPrefix) {
         onWordMatched(appender);

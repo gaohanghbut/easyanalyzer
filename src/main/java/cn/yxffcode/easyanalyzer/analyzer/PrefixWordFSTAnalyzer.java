@@ -19,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class PrefixWordFSTAnalyzer extends Analyzer {
 
   private final FST<CharsRef> fst;
-  private final boolean       outputPrefix;
+  private final boolean outputPrefix;
 
   private PrefixWordFSTAnalyzer(FST<CharsRef> fst, boolean outputPrefix) {
     this.fst = fst;
@@ -32,9 +32,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
    *
    * @param classpath    词典文件的类路径，支持目录
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    * @see #create(String, ClassLoader, boolean)
    */
@@ -56,9 +54,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
    * @param classpath    词典文件的类路径，支持目录
    * @param classLoader  用于加载词典文件的类加载器
    * @param outputPrefix 如果输入不能完全匹配，只匹配了一部分，是否将匹配的一部分输出
-   *
    * @return 基于FST的分词器
-   *
    * @throws IOException 读取字典或创建FST出错
    */
   public static PrefixWordFSTAnalyzer create(String classpath, ClassLoader classLoader,
@@ -96,9 +92,9 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
 
   static class FSTTokenizer extends BaseTokenizer {
 
-    protected final boolean               outputPrefix;
-    protected       IntStack              words;
-    private         IntArrayStringBuilder appender;
+    protected final boolean outputPrefix;
+    protected IntStack words;
+    private IntArrayStringBuilder appender;
 
     FSTTokenizer(FST<CharsRef> fst,
                  boolean outputPrefix) {
@@ -138,9 +134,11 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
 
     @Override
     protected void onUnmatched(IntArrayStringBuilder appender) {
-      if (! words.isEmpty()) {
+      if (!words.isEmpty()) {
         pushBack(appender, words.peak());
         return;
+      } else {
+        pushBack(appender, 1);
       }
       if (outputPrefix) {
         onWordMatched(appender);
@@ -148,7 +146,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
     }
 
     protected void pushBack(final IntArrayStringBuilder appender, final int begin) {
-      for (int i = appender.length() - 1; i >= begin; -- i) {
+      for (int i = appender.length() - 1; i >= begin; --i) {
         bufStack.push(appender.element(i));
       }
     }
@@ -160,7 +158,7 @@ public class PrefixWordFSTAnalyzer extends Analyzer {
     }
 
     protected boolean remains() {
-      return ! words.isEmpty();
+      return !words.isEmpty();
     }
 
     protected int shortestWord() {
