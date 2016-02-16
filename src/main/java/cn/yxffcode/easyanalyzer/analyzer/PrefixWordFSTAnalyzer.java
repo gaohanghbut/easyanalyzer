@@ -14,6 +14,7 @@ import java.util.SortedSet;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * 支持识别为前缀，即如果没有匹配出一个完整的词，只匹配到了一个词的前缀，会认为这个前缀是一个词
  * @author gaohang on 15/11/18.
  */
 public class PrefixWordFSTAnalyzer extends Analyzer {
