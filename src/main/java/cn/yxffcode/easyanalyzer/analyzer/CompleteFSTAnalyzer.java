@@ -15,8 +15,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * 基于lucene的{@link FST}实现的分词器，使用最大匹配。需要指定词典，
  * 同时支持通过代码指定或通过词典文件指定，可以自定义词典格式。
- * mmseg会把汉字，英文和数字分开，即使词典里有"宝马X5"这样的词，
- * mmseg也会把它拆分成三个词(分别是：宝马，X，5).
  * <p/>
  * FSTAnalyzer完全基于字典，暂不支持英文单词以空白字符拆分
  *
