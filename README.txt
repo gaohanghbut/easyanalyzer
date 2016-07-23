@@ -13,8 +13,8 @@
     奥迪Q5
     奥迪
 
-测试代码:
-
+测试代码: 
+```java 
 public class Test {
     public static void main(String[] args) throws IOException {
         System.out.print("前缀词匹配:");
@@ -49,7 +49,7 @@ public class Test {
     }
 
 }
-
+``` 
 
 分词效果:
 
