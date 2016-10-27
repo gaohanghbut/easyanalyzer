@@ -1,4 +1,6 @@
-# 基于Lucene中的有限状态机实现的基于字典的中文分词器
+# EasyAnalyzer
+基于Lucene中的有限状态机实现的基于字典的中文分词器
+
 FST:有限状态转移,见org.apache.lucene.util.fst.FST
 ## 词典:
     湖北
