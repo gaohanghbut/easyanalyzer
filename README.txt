@@ -1,6 +1,6 @@
-基于Lucene中的有限状态机(见org.apache.lucene.util.fst.FST)实现的基于字典的中文分词器
+# 基于Lucene中的有限状态机(见org.apache.lucene.util.fst.FST)实现的基于字典的中文分词器
 
-词典:
+## 词典:
     湖北
     工业
     大学
@@ -13,8 +13,8 @@
     奥迪Q5
     奥迪
 
-测试代码: 
-
+## 测试代码: 
+```
 public class Test {
     public static void main(String[] args) throws IOException {
         System.out.print("前缀词匹配:");
@@ -49,9 +49,9 @@ public class Test {
     }
 
 }
+```
 
-
-分词效果:
+## 分词效果:
 
 前缀词匹配:奥迪 Q 湖北工业大学 湖北工业 湖北 生
 前缀词优先匹配:奥迪Q 奥迪 湖北工业大学 湖北工业 湖北 生
